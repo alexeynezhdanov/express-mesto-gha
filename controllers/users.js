@@ -1,4 +1,5 @@
 const User = require("../models/user");
+
 const ERROR_400 = 400;
 const ERROR_404 = 404;
 const ERROR_500 = 500;
@@ -10,21 +11,21 @@ const ERROR_500_MESSAGE = "Произошла ошибка";
 module.exports.getUser = (req, res) => {
   User.find({})
     .then((users) => res.send({ data: users }))
-    .catch((err) => {
-      if (err.name === "ValidationError") {
-        return res.status(ERROR_400).send({ message: ERROR_400_MESSAGE });
-      } else {
-        return res.status(ERROR_500).send({ message: ERROR_500_MESSAGE });
-      }
-    });
+    .catch(() => res.status(ERROR_500).send({ message: ERROR_500_MESSAGE }));
 };
 
 module.exports.getUserId = (req, res) => {
   User.findById(req.params.userId)
-    .then((user) => res.send(user))
+    .then((user) => {
+      if (!user) {
+        res.status(ERROR_404).send({ message: ERROR_404_MESSAGE });
+      } else {
+        res.send(user);
+      }
+    })
     .catch((err) => {
       if (err.name === "CastError") {
-        return res.status(ERROR_404).send({ message: ERROR_404_MESSAGE });
+        return res.status(ERROR_400).send({ message: ERROR_400_MESSAGE });
       } else {
         return res.status(ERROR_500).send({ message: ERROR_500_MESSAGE });
       }
@@ -39,7 +40,7 @@ module.exports.createUser = (req, res) => {
       if (err.name === "ValidationError") {
         return res.status(ERROR_400).send({ message: ERROR_400_MESSAGE });
       } else {
-        return res.status(ERROR_500).send({ message: ERROR_500_MESSAGE });
+      return res.status(ERROR_500).send({ message: ERROR_500_MESSAGE });
       }
     });
 };
@@ -52,18 +53,20 @@ module.exports.patchProfile = (req, res) => {
     {
       new: true,
       runValidators: true,
-      upsert: true,
     }
   )
-    .then((user) => res.send({ data: user }))
-    .catch((err) => {
-      if (err.name === "ValidationError") {
-        return res.status(ERROR_400).send({ message: ERROR_400_MESSAGE });
-      }
-      if (err.name === "CastError") {
-        return res.status(ERROR_404).send({ message: ERROR_404_MESSAGE });
+    .then((user) => {
+      if (!user) {
+        res.status(ERROR_404).send({ message: ERROR_404_MESSAGE });
       } else {
-        return res.status(ERROR_500).send({ message: ERROR_500_MESSAGE });
+        res.send({ data: user });
+      }
+    })
+    .catch((err) => {
+      if (err.name === "CastError") {
+        return res.status(ERROR_400).send({ message: ERROR_400_MESSAGE });
+      } else {
+      return res.status(ERROR_500).send({ message: ERROR_500_MESSAGE });
       }
     });
 };
@@ -76,18 +79,20 @@ module.exports.patchAvatar = (req, res) => {
     {
       new: true,
       runValidators: true,
-      upsert: true,
-    }
+    },
   )
-    .then((user) => res.send({ data: user }))
-    .catch((err) => {
-      if (err.name === "ValidationError") {
-        return res.status(ERROR_400).send({ message: ERROR_400_MESSAGE });
-      }
-      if (err.name === "CastError") {
-        return res.status(ERROR_404).send({ message: ERROR_404_MESSAGE });
+    .then((user) => {
+      if (!user) {
+        res.status(ERROR_404).send({ message: ERROR_404_MESSAGE });
       } else {
-        return res.status(ERROR_500).send({ message: ERROR_500_MESSAGE });
+        res.send({ data: user });
+      }
+    })
+    .catch((err) => {
+      if (err.name === "CastError") {
+        return res.status(ERROR_400).send({ message: ERROR_400_MESSAGE });
+      } else {
+      return res.status(ERROR_500).send({ message: ERROR_500_MESSAGE });
       }
     });
 };
