@@ -35,20 +35,31 @@ module.exports.getUserId = (req, res, next) => {
     });
 };
 
+module.exports.login = (req, res, next) => {
+  const { email, password } = req.body;
+
+  User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign(
+        { _id: user._id },
+        'some-secret-key',
+        { expiresIn: '7d' },
+      );
+      res
+        .send({ token })
+        .cookie({ token }, {
+          httpOnly: true,
+        });
+    })
+    .catch(() => next(new UnauthorizedError(ERROR_401_MESSAGE)));
+};
+
 module.exports.createUser = (req, res, next) => {
   const {
     name,
     about,
     avatar,
-    email,
   } = req.body;
-  User.find({ email })
-    .then((result) => {
-      if (result.length > 0) {
-        throw new ConflictError(`Пользователь с email '${email}' уже существует!`);
-      }
-    })
-    .catch((err) => next(err));
   bcrypt
     .hash(req.body.password, 10)
     .then((hash) => User.create({
@@ -141,23 +152,4 @@ module.exports.patchAvatar = (req, res, next) => {
         next(err);
       }
     });
-};
-
-module.exports.login = (req, res, next) => {
-  const { email, password } = req.body;
-
-  User.findUserByCredentials(email, password)
-    .then((user) => {
-      const token = jwt.sign(
-        { _id: user._id },
-        'some-secret-key',
-        { expiresIn: '7d' },
-      );
-      res
-        .send({ token })
-        .cookie({ token }, {
-          httpOnly: true,
-        });
-    })
-    .catch(() => next(new UnauthorizedError(ERROR_401_MESSAGE)));
 };
