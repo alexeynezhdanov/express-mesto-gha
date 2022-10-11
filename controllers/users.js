@@ -4,7 +4,6 @@ const User = require('../models/user');
 const NotFoundError = require('../errors/not-found-err');
 const IncorrectDataError = require('../errors/incorrect-data-err');
 const UnauthorizedError = require('../errors/unauthorized-err');
-const ConflictError = require('../errors/conflict-err');
 
 const ERROR_400_MESSAGE = 'Переданы некорректные данные в методы создания пользователя, профиля или аватара';
 const ERROR_404_MESSAGE = 'Запрашиваемый пользователь не найден';
