@@ -1,14 +1,14 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const { celebrate, Joi } = require('celebrate');
+const { celebrate, Joi, errors } = require('celebrate');
 const {
   login,
   createUser,
 } = require('./controllers/users');
 
 const { auth } = require('./middlewares/auth');
-const { errors } = require('./middlewares/errors');
+const { error } = require('./middlewares/error');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -36,12 +36,14 @@ app.post('/signup', celebrate({
   }),
 }), createUser);
 
+app.use(errors());
+
 app.use(auth);
 
 app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
 
-app.use(errors);
+app.use(error);
 
 app.listen(PORT, () => {
   // Если всё работает, консоль покажет, какой порт приложение слушает
