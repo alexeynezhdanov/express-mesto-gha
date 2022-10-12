@@ -78,7 +78,7 @@ module.exports.createUser = (req, res, next) => {
       avatar,
       email: req.body.email,
       password: hash,
-    }, { runValidators: true }))
+    }))
     .then((user) => res
       .send({ data: user }))
     .catch((err) => {
