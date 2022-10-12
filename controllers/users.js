@@ -80,6 +80,9 @@ module.exports.createUser = (req, res, next) => {
     .then((user) => {
       res.status(201).send({
         _id: user._id,
+        name: user.name,
+        about: user.about,
+        avatar: user.avatar,
         email: user.email,
       });
     })
@@ -95,10 +98,16 @@ module.exports.createUser = (req, res, next) => {
 module.exports.getUserId = (req, res, next) => {
   User.findById(req.params.userId)
     .then((user) => {
-      if (!user) {
-        throw new NotFoundError(ERROR_404_MESSAGE);
+      if (user) {
+        res.status(200).send({
+          _id: user._id,
+          name: user.name,
+          about: user.about,
+          avatar: user.avatar,
+          email: user.email,
+        });
       } else {
-        res.send(user);
+        throw new NotFoundError(ERROR_404_MESSAGE);
       }
     })
     .catch((err) => {

@@ -60,7 +60,7 @@ module.exports.putLikes = (req, res, next) => {
   )
     .then((card) => {
       if (!card) {
-        next(new NotFoundError(ERROR_404_MESSAGE));
+        throw new NotFoundError(ERROR_404_MESSAGE);
       } else {
         res.send({ data: card });
       }
@@ -84,7 +84,7 @@ module.exports.deleteLikes = (req, res, next) => {
   )
     .then((card) => {
       if (!card) {
-        next(new NotFoundError(ERROR_404_MESSAGE));
+        throw new NotFoundError(ERROR_404_MESSAGE);
       } else {
         res.send({ data: card });
       }
