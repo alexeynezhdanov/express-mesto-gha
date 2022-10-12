@@ -61,7 +61,6 @@ module.exports.createUser = (req, res, next) => {
     avatar,
     email,
   } = req.body;
-  /*
   User.find({ email })
     .then((result) => {
       if (result.length > 0) {
@@ -69,7 +68,6 @@ module.exports.createUser = (req, res, next) => {
       }
     })
     .catch((err) => next(err));
-    */
   bcrypt
     .hash(req.body.password, 10)
     .then(() => User.create({
@@ -83,9 +81,6 @@ module.exports.createUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError(ERROR_400_MESSAGE));
-      }
-      if (err.code === 11000) {
-        next(new ConflictError(`Пользователь с email '${email}' уже существует!`));
       } else {
         next(err);
       }
