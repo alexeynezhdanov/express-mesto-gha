@@ -2,8 +2,9 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const NotFoundError = require('../errors/not-found-err');
-const IncorrectDataError = require('../errors/incorrect-data-err');
+const BadRequestError = require('../errors/badrequest-err');
 const UnauthorizedError = require('../errors/unauthorized-err');
+const ConflictError = require('../errors/conflict-err');
 
 const ERROR_400_MESSAGE = 'Переданы некорректные данные в методы создания пользователя, профиля или аватара';
 const ERROR_404_MESSAGE = 'Запрашиваемый пользователь не найден';
@@ -27,7 +28,7 @@ module.exports.getUserId = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new IncorrectDataError(ERROR_400_MESSAGE));
+        next(new BadRequestError(ERROR_400_MESSAGE));
       } else {
         next(err);
       }
@@ -58,7 +59,17 @@ module.exports.createUser = (req, res, next) => {
     name,
     about,
     avatar,
+    email,
   } = req.body;
+  /*
+  User.find({ email })
+    .then((result) => {
+      if (result.length > 0) {
+        throw new ConflictError(`Пользователь с email '${email}' уже существует!`);
+      }
+    })
+    .catch((err) => next(err));
+    */
   bcrypt
     .hash(req.body.password, 10)
     .then((hash) => User.create({
@@ -72,24 +83,32 @@ module.exports.createUser = (req, res, next) => {
       .send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new IncorrectDataError(ERROR_400_MESSAGE));
+        next(new BadRequestError(ERROR_400_MESSAGE));
+      }
+      if (err.code === 11000) {
+        next(new ConflictError(`Пользователь с email '${email}' уже существует!`));
       } else {
         next(err);
       }
     });
 };
 
-module.exports.deleteUserId = (req, res, next) => {
-  User.findByIdAndRemove(req.params.userId)
+module.exports.getUserId = (req, res, next) => {
+  User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
         throw new NotFoundError(ERROR_404_MESSAGE);
       } else {
-        res
-          .send(user);
+        res.send(user);
       }
     })
-    .catch((err) => next(err));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequestError(ERROR_400_MESSAGE));
+      } else {
+        next(err);
+      }
+    });
 };
 
 module.exports.getUserMe = (req, res, next) => {
@@ -119,7 +138,7 @@ module.exports.patchProfile = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
-        next(new IncorrectDataError(ERROR_400_MESSAGE));
+        next(new BadRequestError(ERROR_400_MESSAGE));
       } else {
         next(err);
       }
@@ -146,7 +165,7 @@ module.exports.patchAvatar = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
-        next(new IncorrectDataError(ERROR_400_MESSAGE));
+        next(new BadRequestError(ERROR_400_MESSAGE));
       } else {
         next(err);
       }

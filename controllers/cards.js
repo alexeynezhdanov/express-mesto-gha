@@ -1,7 +1,7 @@
 const Card = require('../models/card');
 const NotFoundError = require('../errors/not-found-err');
-const IncorrectDataError = require('../errors/incorrect-data-err');
-const DeletionError = require('../errors/deletion-err');
+const BadRequestError = require('../errors/badrequest-err');
+const ForbiddenError = require('../errors/forbidden-err');
 
 const ERROR_400_MESSAGE = 'Переданы некорректные данные в методы создания карточки';
 const ERROR_404_MESSAGE = 'Запрашиваемая карточка не найдена';
@@ -19,7 +19,7 @@ module.exports.createCard = (req, res, next) => {
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new IncorrectDataError(ERROR_400_MESSAGE));
+        next(new BadRequestError(ERROR_400_MESSAGE));
       } else {
         next(err);
       }
@@ -27,20 +27,22 @@ module.exports.createCard = (req, res, next) => {
 };
 
 module.exports.deleteCard = (req, res, next) => {
-  Card.findByIdAndRemove(
-    req.params.cardId,
-    { owner: req.user._id },
-  )
+  const ownerId = req.user._id;
+  Card.findById(req.params.cardId)
+    .orFail(new NotFoundError(`Запрашиваемая карточка c id '${req.params.cardId}' не найдена`))
     .then((card) => {
-      if (!card) {
-        next(new NotFoundError(ERROR_404_MESSAGE));
-      } else {
-        res.send({ data: card });
+      if (card) {
+        if (card.owner.toString() === ownerId) {
+          card.delete()
+            .then(() => res
+              .status(200)
+              .json({ message: `Карточка с id '${req.params.cardId}' успешно удалена` }));
+        } else { throw new ForbiddenError(ERROR_403_MESSAGE); }
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new DeletionError(ERROR_403_MESSAGE));
+        next(new BadRequestError(`'${req.params.cardId}' не является идентификатором`));
       } else {
         next(err);
       }
@@ -65,7 +67,7 @@ module.exports.putLikes = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new IncorrectDataError(ERROR_400_MESSAGE));
+        next(new BadRequestError(ERROR_400_MESSAGE));
       } else {
         next(err);
       }
@@ -89,7 +91,7 @@ module.exports.deleteLikes = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new IncorrectDataError(ERROR_400_MESSAGE));
+        next(new BadRequestError(ERROR_400_MESSAGE));
       } else {
         next(err);
       }

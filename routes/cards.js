@@ -9,12 +9,11 @@ const {
 
 const {
   cardValidation,
-  cardIdValidation,
 } = require('../middlewares/validation');
 
 router.get('/', getCard);
 router.post('/', cardValidation, createCard);
-router.delete('/:cardId', cardIdValidation, deleteCard);
+router.delete('/:cardId', deleteCard);
 router.put('/:cardId/likes', putLikes);
 router.delete('/:cardId/likes', deleteLikes);
 

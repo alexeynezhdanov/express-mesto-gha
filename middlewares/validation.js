@@ -1,10 +1,10 @@
 const { celebrate, Joi } = require('celebrate');
 const validator = require('validator');
 
-const method = (v) => {
-  const result = validator.isURL(v);
+const method = (val) => {
+  const result = validator.isURL(val);
   if (result) {
-    return v;
+    return val;
   } throw new Error('Ошибка URL');
 };
 
