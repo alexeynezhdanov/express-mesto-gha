@@ -6,6 +6,7 @@ const {
   login,
   createUser,
 } = require('./controllers/users');
+const NotFoundError = require('./errors/not-found-err');
 
 const {
   authValidation,
@@ -27,6 +28,10 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 
 app.post('/signin', authValidation, login);
 app.post('/signup', regValidation, createUser);
+
+app.use('/', (req, res, next) => {
+  next(new NotFoundError('Такой страницы нет'));
+});
 
 app.use(auth);
 
