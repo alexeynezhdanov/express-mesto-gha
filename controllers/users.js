@@ -102,16 +102,11 @@ module.exports.createUser = (req, res, next) => {
 module.exports.getUserId = (req, res, next) => {
   User.findById(req.params.userId)
     .then((user) => {
-      if (user) {
-        res.status(200).send({
-          _id: user._id,
-          name: user.name,
-          about: user.about,
-          avatar: user.avatar,
-          email: user.email,
-        });
-      } else {
+      if (!user) {
         throw new NotFoundError(ERROR_404_MESSAGE);
+      } else {
+        res
+          .send(user);
       }
     })
     .catch((err) => {
@@ -134,9 +129,7 @@ module.exports.getUserMe = (req, res, next) => {
           avatar: user.avatar,
           email: user.email,
         });
-      } else {
-        throw new NotFoundError(ERROR_404_MESSAGE);
-      }
+      } else { throw new BadRequestError(ERROR_400_MESSAGE); }
     })
     .catch((err) => next(err));
 };
