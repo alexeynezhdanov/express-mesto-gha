@@ -40,16 +40,20 @@ module.exports.login = (req, res, next) => {
 
   User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign(
-        { _id: user._id },
-        'some-secret-key',
-        { expiresIn: '7d' },
-      );
-      res
-        .send({ token })
-        .cookie({ token }, {
-          httpOnly: true,
-        });
+      if (user) {
+        const token = jwt.sign(
+          { _id: user._id },
+          'some-secret-key',
+          { expiresIn: '7d' },
+        );
+        res
+          .send({ token })
+          .cookie({ token }, {
+            httpOnly: true,
+          });
+      } else {
+        throw new NotFoundError(ERROR_404_MESSAGE);
+      }
     })
     .catch(() => next(new UnauthorizedError(ERROR_401_MESSAGE)));
 };
@@ -121,8 +125,13 @@ module.exports.getUserId = (req, res, next) => {
 
 module.exports.getUserMe = (req, res, next) => {
   User.findById(req.params.user)
-    .then((user) => res
-      .send({ data: user }))
+    .then((user) => {
+      if (user) {
+        res.status(200).send({ data: user });
+      } else {
+        throw new NotFoundError(ERROR_404_MESSAGE);
+      }
+    })
     .catch((err) => next(err));
 };
 
@@ -137,11 +146,11 @@ module.exports.patchProfile = (req, res, next) => {
     },
   )
     .then((user) => {
-      if (!user) {
-        throw new NotFoundError(ERROR_404_MESSAGE);
-      } else {
+      if (user) {
         res
           .send({ data: user });
+      } else {
+        throw new NotFoundError(ERROR_404_MESSAGE);
       }
     })
     .catch((err) => {
@@ -164,11 +173,11 @@ module.exports.patchAvatar = (req, res, next) => {
     },
   )
     .then((user) => {
-      if (!user) {
-        throw new NotFoundError(ERROR_404_MESSAGE);
-      } else {
+      if (user) {
         res
           .send({ data: user });
+      } else {
+        throw new NotFoundError(ERROR_404_MESSAGE);
       }
     })
     .catch((err) => {
