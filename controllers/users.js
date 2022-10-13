@@ -124,10 +124,16 @@ module.exports.getUserId = (req, res, next) => {
 };
 
 module.exports.getUserMe = (req, res, next) => {
-  User.findById(req.params.user)
+  User.findById(req.user._id)
     .then((user) => {
       if (user) {
-        res.status(200).send({ data: user });
+        res.status(200).send({
+          _id: user._id,
+          name: user.name,
+          about: user.about,
+          avatar: user.avatar,
+          email: user.email,
+        });
       } else {
         throw new NotFoundError(ERROR_404_MESSAGE);
       }
