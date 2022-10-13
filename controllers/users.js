@@ -23,6 +23,7 @@ module.exports.getUserId = (req, res, next) => {
         throw new NotFoundError(ERROR_404_MESSAGE);
       } else {
         res
+          .status(200)
           .send(user);
       }
     })
@@ -37,10 +38,11 @@ module.exports.getUserId = (req, res, next) => {
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
-
   User.findUserByCredentials(email, password)
     .then((user) => {
-      if (user) {
+      if (!user) {
+        throw new NotFoundError(ERROR_404_MESSAGE);
+      } else {
         const token = jwt.sign(
           { _id: user._id },
           'some-secret-key',
@@ -51,8 +53,6 @@ module.exports.login = (req, res, next) => {
           .cookie({ token }, {
             httpOnly: true,
           });
-      } else {
-        throw new NotFoundError(ERROR_404_MESSAGE);
       }
     })
     .catch(() => next(new UnauthorizedError(ERROR_401_MESSAGE)));
@@ -82,13 +82,15 @@ module.exports.createUser = (req, res, next) => {
       password: hash,
     }))
     .then((user) => {
-      res.status(201).send({
-        _id: user._id,
-        name: user.name,
-        about: user.about,
-        avatar: user.avatar,
-        email: user.email,
-      });
+      res
+        .status(201)
+        .send({
+          _id: user._id,
+          name: user.name,
+          about: user.about,
+          avatar: user.avatar,
+          email: user.email,
+        });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -106,6 +108,7 @@ module.exports.getUserId = (req, res, next) => {
         throw new NotFoundError(ERROR_404_MESSAGE);
       } else {
         res
+          .status(200)
           .send(user);
       }
     })
@@ -121,15 +124,19 @@ module.exports.getUserId = (req, res, next) => {
 module.exports.getUserMe = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
-      if (user) {
-        res.status(200).send({
-          _id: user._id,
-          name: user.name,
-          about: user.about,
-          avatar: user.avatar,
-          email: user.email,
-        });
-      } else { throw new BadRequestError(ERROR_400_MESSAGE); }
+      if (!user) {
+        throw new BadRequestError(ERROR_400_MESSAGE);
+      } else {
+        res
+          .status(200)
+          .send({
+            _id: user._id,
+            name: user.name,
+            about: user.about,
+            avatar: user.avatar,
+            email: user.email,
+          });
+      }
     })
     .catch((err) => next(err));
 };
@@ -145,11 +152,12 @@ module.exports.patchProfile = (req, res, next) => {
     },
   )
     .then((user) => {
-      if (user) {
-        res
-          .send({ data: user });
-      } else {
+      if (!user) {
         throw new NotFoundError(ERROR_404_MESSAGE);
+      } else {
+        res
+          .status(200)
+          .send({ data: user });
       }
     })
     .catch((err) => {
@@ -172,11 +180,12 @@ module.exports.patchAvatar = (req, res, next) => {
     },
   )
     .then((user) => {
-      if (user) {
-        res
-          .send({ data: user });
-      } else {
+      if (!user) {
         throw new NotFoundError(ERROR_404_MESSAGE);
+      } else {
+        res
+          .status(200)
+          .send({ data: user });
       }
     })
     .catch((err) => {
