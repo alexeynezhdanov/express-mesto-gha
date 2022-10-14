@@ -48,9 +48,6 @@ module.exports.login = (req, res, next) => {
           { expiresIn: '7d' },
         );
         res
-          .cookie({ token }, {
-            httpOnly: true,
-          })
           .send({ token });
       }
     })

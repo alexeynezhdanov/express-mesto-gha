@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { errors } = require('celebrate');
+const router = require('./routes/index');
 
 const { errorhandler } = require('./middlewares/errorhandler');
 
@@ -15,7 +16,7 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
 });
 
-app.use('/', require('./routes/index'));
+app.use(router);
 
 app.use(errors());
 app.use(errorhandler);
