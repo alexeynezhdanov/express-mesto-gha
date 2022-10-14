@@ -1,11 +1,11 @@
 const { celebrate, Joi } = require('celebrate');
 const validator = require('validator');
 
-const method = (val) => {
-  const result = validator.isURL(val);
+const method = (value, helper) => {
+  const result = validator.isURL(value);
   if (result) {
-    return val;
-  } throw new Error('Ошибка URL');
+    return helper.message('avatar должно быть валидным url');
+  } return value;
 };
 
 module.exports.authValidation = celebrate({
