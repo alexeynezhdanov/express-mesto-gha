@@ -25,13 +25,7 @@ module.exports.getUser = (req, res, next) => {
 };
 
 module.exports.getUserId = (req, res, next) => {
-  User.findById(
-    req.params.userId,
-    {
-      new: true,
-      runValidators: true,
-    },
-  )
+  User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
         throw new NotFoundError(ERROR_404_MESSAGE);
@@ -51,14 +45,7 @@ module.exports.getUserId = (req, res, next) => {
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
-  User.findUserByCredentials(
-    email,
-    password,
-    {
-      new: true,
-      runValidators: true,
-    },
-  )
+  User.findUserByCredentials(email, password)
     .then((user) => {
       if (!user) {
         throw new NotFoundError(ERROR_404_MESSAGE);
@@ -95,7 +82,6 @@ module.exports.createUser = (req, res, next) => {
       password: hash,
     }))
     .then((user) => {
-      console.log(user);
       res
         .status(201)
         .send({
@@ -107,7 +93,6 @@ module.exports.createUser = (req, res, next) => {
         });
     })
     .catch((err) => {
-      console.log(err);
       if (err.code === 11000) {
         next(new ConflictError(`Пользователь с email '${email}' уже существует!`));
       } else if (err.name === 'ValidationError') {
@@ -119,13 +104,7 @@ module.exports.createUser = (req, res, next) => {
 };
 
 module.exports.getUserId = (req, res, next) => {
-  User.findById(
-    req.params.userId,
-    {
-      new: true,
-      runValidators: true,
-    },
-  )
+  User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
         throw new NotFoundError(ERROR_404_MESSAGE);
@@ -145,13 +124,7 @@ module.exports.getUserId = (req, res, next) => {
 };
 
 module.exports.getUserMe = (req, res, next) => {
-  User.findById(
-    req.user._id,
-    {
-      new: true,
-      runValidators: true,
-    },
-  )
+  User.findById(req.user._id)
     .then((user) => {
       if (!user) {
         throw new NotFoundError(ERROR_404_MESSAGE);
@@ -175,10 +148,6 @@ module.exports.patchProfile = (req, res, next) => {
   User.findByIdAndUpdate(
     req.user,
     { name, about },
-    {
-      new: true,
-      runValidators: true,
-    },
   )
     .then((user) => {
       if (!user) {
@@ -203,10 +172,6 @@ module.exports.patchAvatar = (req, res, next) => {
   User.findByIdAndUpdate(
     req.user,
     { avatar },
-    {
-      new: true,
-      runValidators: true,
-    },
   )
     .then((user) => {
       if (!user) {
