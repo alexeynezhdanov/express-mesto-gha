@@ -36,7 +36,8 @@ module.exports.deleteCard = (req, res, next) => {
           card.delete()
             .then(() => res
               .status(200)
-              .json({ message: `Карточка с id '${req.params.cardId}' успешно удалена` }));
+              .json({ message: `Карточка с id '${req.params.cardId}' успешно удалена` }))
+            .catch(next);
         } else { throw new ForbiddenError(ERROR_403_MESSAGE); }
       }
     })

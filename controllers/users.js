@@ -23,7 +23,6 @@ module.exports.getUserId = (req, res, next) => {
         throw new NotFoundError(ERROR_404_MESSAGE);
       } else {
         res
-          .status(200)
           .send(user);
       }
     })
@@ -49,10 +48,10 @@ module.exports.login = (req, res, next) => {
           { expiresIn: '7d' },
         );
         res
-          .send({ token })
           .cookie({ token }, {
             httpOnly: true,
-          });
+          })
+          .send({ token });
       }
     })
     .catch(() => next(new UnauthorizedError(ERROR_401_MESSAGE)));
@@ -65,13 +64,6 @@ module.exports.createUser = (req, res, next) => {
     avatar,
     email,
   } = req.body;
-  User.find({ email })
-    .then((result) => {
-      if (result.length > 0) {
-        throw new ConflictError(`Пользователь с email '${email}' уже существует!`);
-      }
-    })
-    .catch((err) => next(err));
   bcrypt
     .hash(req.body.password, 10)
     .then((hash) => User.create({
@@ -93,7 +85,9 @@ module.exports.createUser = (req, res, next) => {
         });
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.code === 11000) {
+        next(new ConflictError(`Пользователь с email '${email}' уже существует!`));
+      } else if (err.name === 'ValidationError') {
         next(new BadRequestError(ERROR_400_MESSAGE));
       } else {
         next(err);
@@ -108,7 +102,6 @@ module.exports.getUserId = (req, res, next) => {
         throw new NotFoundError(ERROR_404_MESSAGE);
       } else {
         res
-          .status(200)
           .send(user);
       }
     })
@@ -125,10 +118,9 @@ module.exports.getUserMe = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
       if (!user) {
-        throw new BadRequestError(ERROR_400_MESSAGE);
+        throw new NotFoundError(ERROR_404_MESSAGE);
       } else {
         res
-          .status(200)
           .send({
             _id: user._id,
             name: user.name,
@@ -156,7 +148,6 @@ module.exports.patchProfile = (req, res, next) => {
         throw new NotFoundError(ERROR_404_MESSAGE);
       } else {
         res
-          .status(200)
           .send({ data: user });
       }
     })
@@ -184,7 +175,6 @@ module.exports.patchAvatar = (req, res, next) => {
         throw new NotFoundError(ERROR_404_MESSAGE);
       } else {
         res
-          .status(200)
           .send({ data: user });
       }
     })

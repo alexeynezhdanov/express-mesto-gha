@@ -6,7 +6,7 @@ const ERROR_401_MESSAGE = 'Необходима авторизация';
 module.exports.auth = (req, res, next) => {
   const { authorization } = req.headers;
   if (!authorization || !authorization.startsWith('Bearer ')) {
-    next(new UnauthorizedError(ERROR_401_MESSAGE));
+    throw new UnauthorizedError(ERROR_401_MESSAGE);
   }
   const token = authorization.replace('Bearer ', '');
   let payload;

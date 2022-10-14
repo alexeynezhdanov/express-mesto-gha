@@ -2,19 +2,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { errors } = require('celebrate');
-const {
-  login,
-  createUser,
-} = require('./controllers/users');
-const NotFoundError = require('./errors/not-found-err');
 
-const {
-  authValidation,
-  regValidation,
-} = require('./middlewares/validation');
-
-const { auth } = require('./middlewares/auth');
 const { errorhandler } = require('./middlewares/errorhandler');
+const { rourer } = require('./routes/index');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -26,17 +16,7 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
 });
 
-app.post('/signin', authValidation, login);
-app.post('/signup', regValidation, createUser);
-
-app.use(auth);
-
-app.use('/users', require('./routes/users'));
-app.use('/cards', require('./routes/cards'));
-
-app.use('/', (req, res, next) => {
-  next(new NotFoundError('Такой страницы нет'));
-});
+app.use(rourer);
 
 app.use(errors());
 app.use(errorhandler);
