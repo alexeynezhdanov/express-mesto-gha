@@ -16,13 +16,12 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
 });
 
-app.use(rourer);
+app.use('/', require('./routes/index'));
 
 app.use(errors());
 app.use(errorhandler);
 
 app.listen(PORT, () => {
   // Если всё работает, консоль покажет, какой порт приложение слушает
-  // eslint-disable-next-line no-console
   console.log(`App listening on port ${PORT}`);
 });
