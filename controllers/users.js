@@ -25,7 +25,13 @@ module.exports.getUser = (req, res, next) => {
 };
 
 module.exports.getUserId = (req, res, next) => {
-  User.findById(req.params.userId)
+  User.findById(
+    req.params.userId,
+    {
+      new: true,
+      runValidators: true,
+    },
+  )
     .then((user) => {
       if (!user) {
         throw new NotFoundError(ERROR_404_MESSAGE);
@@ -45,7 +51,14 @@ module.exports.getUserId = (req, res, next) => {
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
-  User.findUserByCredentials(email, password)
+  User.findUserByCredentials(
+    email,
+    password,
+    {
+      new: true,
+      runValidators: true,
+    },
+  )
     .then((user) => {
       if (!user) {
         throw new NotFoundError(ERROR_404_MESSAGE);
@@ -101,7 +114,13 @@ module.exports.createUser = (req, res, next) => {
 };
 
 module.exports.getUserId = (req, res, next) => {
-  User.findById(req.params.userId)
+  User.findById(
+    req.params.userId,
+    {
+      new: true,
+      runValidators: true,
+    },
+  )
     .then((user) => {
       if (!user) {
         throw new NotFoundError(ERROR_404_MESSAGE);
@@ -121,7 +140,13 @@ module.exports.getUserId = (req, res, next) => {
 };
 
 module.exports.getUserMe = (req, res, next) => {
-  User.findById(req.user._id)
+  User.findById(
+    req.user._id,
+    {
+      new: true,
+      runValidators: true,
+    },
+  )
     .then((user) => {
       if (!user) {
         throw new NotFoundError(ERROR_404_MESSAGE);
@@ -134,12 +159,7 @@ module.exports.getUserMe = (req, res, next) => {
             about: user.about,
             avatar: user.avatar,
             email: user.email,
-          },
-          {
-            new: true,
-            runValidators: true,
-          },
-          );
+          });
       }
     })
     .catch((err) => next(err));
