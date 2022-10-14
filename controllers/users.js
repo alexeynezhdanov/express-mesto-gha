@@ -12,7 +12,15 @@ const ERROR_401_MESSAGE = 'С вашим токеном что-то не так'
 
 module.exports.getUser = (req, res, next) => {
   User.find({})
-    .then((users) => res.send({ data: users }))
+    .then((users) => {
+      if (!users) {
+        throw new NotFoundError('Запрашиваемые пользователи не найдены');
+      } else {
+        res
+          .status(200)
+          .send({ data: users });
+      }
+    })
     .catch((err) => next(err));
 };
 
@@ -99,6 +107,7 @@ module.exports.getUserId = (req, res, next) => {
         throw new NotFoundError(ERROR_404_MESSAGE);
       } else {
         res
+          .status(200)
           .send(user);
       }
     })
@@ -118,13 +127,19 @@ module.exports.getUserMe = (req, res, next) => {
         throw new NotFoundError(ERROR_404_MESSAGE);
       } else {
         res
+          .status(200)
           .send({
             _id: user._id,
             name: user.name,
             about: user.about,
             avatar: user.avatar,
             email: user.email,
-          });
+          },
+          {
+            new: true,
+            runValidators: true,
+          },
+          );
       }
     })
     .catch((err) => next(err));
@@ -145,6 +160,7 @@ module.exports.patchProfile = (req, res, next) => {
         throw new NotFoundError(ERROR_404_MESSAGE);
       } else {
         res
+          .status(200)
           .send({ data: user });
       }
     })
@@ -172,6 +188,7 @@ module.exports.patchAvatar = (req, res, next) => {
         throw new NotFoundError(ERROR_404_MESSAGE);
       } else {
         res
+          .status(200)
           .send({ data: user });
       }
     })

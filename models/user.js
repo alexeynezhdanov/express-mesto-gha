@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 const validator = require('validator');
 const UnauthorizedError = require('../errors/unauthorized-err');
 
-const checkURL = /^(https?:\/\/)?[-a-zA-Z0-9@:%_\\+.~#?&\\/=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\\+.~#?&\\/=]*)?/gi;
+const checkURL = /^(https?:\/\/)?[-a-zA-Z0-9@:%_+.~#?&/=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_+.~#?&/=]*)?/gi;
 
 const ERROR_401_MESSAGE = 'Неправильные почта или пароль';
 
