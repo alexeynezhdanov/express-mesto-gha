@@ -69,7 +69,10 @@ module.exports.login = (req, res, next) => {
           { expiresIn: '7d' },
         );
         res
-          .send({ token });
+          .send({ token })
+          .cookie({ token }, {
+            httpOnly: true,
+          });
       }
     })
     .catch(() => next(new UnauthorizedError(ERROR_401_MESSAGE)));
