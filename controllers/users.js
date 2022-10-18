@@ -148,6 +148,10 @@ module.exports.patchProfile = (req, res, next) => {
   User.findByIdAndUpdate(
     req.user,
     { name, about },
+    {
+      new: true,
+      runValidators: true,
+    },
   )
     .then((user) => {
       if (!user) {
@@ -172,6 +176,10 @@ module.exports.patchAvatar = (req, res, next) => {
   User.findByIdAndUpdate(
     req.user,
     { avatar },
+    {
+      new: true,
+      runValidators: true,
+    },
   )
     .then((user) => {
       if (!user) {
