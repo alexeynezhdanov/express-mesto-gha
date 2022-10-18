@@ -3,7 +3,7 @@ const validator = require('validator');
 
 const method = (value, helper) => {
   const result = validator.isURL(value);
-  if (result) {
+  if (!result) {
     return helper.message('аватар должен быть валидным url');
   } return value;
 };
