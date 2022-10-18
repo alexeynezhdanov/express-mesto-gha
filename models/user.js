@@ -3,9 +3,8 @@ const bcrypt = require('bcrypt');
 const validator = require('validator');
 const UnauthorizedError = require('../errors/unauthorized-err');
 
-const checkURL = "^(?:http(s)?:\\/\\/)?[\\w.-]+(?:\\.[\\w.-]+)+[\\w\\-._~:/?#[\\]@!$&'()*+,;=.]+$";
-
 const ERROR_401_MESSAGE = 'Неправильные почта или пароль';
+const check2 = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/;
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -25,7 +24,7 @@ const userSchema = new mongoose.Schema({
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
     validate: {
       validator(v) {
-        return checkURL.test(v);
+        return check2.test(v);
       },
       message: 'Введите ссылку!',
     },

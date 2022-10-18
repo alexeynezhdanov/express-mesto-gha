@@ -80,27 +80,22 @@ module.exports.createUser = (req, res, next) => {
       avatar,
       email: req.body.email,
       password: hash,
+    }))
+    .then((user) => {
+      res
+        .status(201)
+        .send({
+          _id: user._id,
+          name: user.name,
+          about: user.about,
+          avatar: user.avatar,
+          email: user.email,
+        });
     })
-      .then((user) => {
-        res
-          .status(201)
-          .send({
-            _id: user._id,
-            name: user.name,
-            about: user.about,
-            avatar: user.avatar,
-            email: user.email,
-          });
-      })
-      .catch((err) => {
-        if (err.code === 11000) {
-          next(new ConflictError(`Пользователь с email '${email}' уже существует!`));
-        } else {
-          next(err);
-        }
-      }))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.code === 11000) {
+        next(new ConflictError(`Пользователь с email '${email}' уже существует!`));
+      } else if (err.name === 'ValidationError') {
         next(new BadRequestError(ERROR_400_MESSAGE));
       } else {
         next(err);
