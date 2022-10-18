@@ -91,11 +91,16 @@ module.exports.createUser = (req, res, next) => {
             avatar: user.avatar,
             email: user.email,
           });
+      })
+      .catch((err) => {
+        if (err.code === 11000) {
+          next(new ConflictError(`Пользователь с email '${email}' уже существует!`));
+        } else {
+          next(err);
+        }
       }))
     .catch((err) => {
-      if (err.code === 11000) {
-        next(new ConflictError(`Пользователь с email '${email}' уже существует!`));
-      } else if (err.name === 'ValidationError') {
+      if (err.name === 'ValidationError') {
         next(new BadRequestError(ERROR_400_MESSAGE));
       } else {
         next(err);
